@@ -21,16 +21,28 @@ class Table:
     def add_row(self, def_value = ' '):
         """Adds a row at the end of the table."""
 
+        self.cell_matrix.append([Cell(column, self.rows, def_value) for column in range(0, self.columns)])
         self.rows += 1
-        self.cell_matrix.append([Cell(column, self.rows-1, def_value) for column in range(0, self.columns)])
 
     def add_column(self, def_value = ' '):
         """Adds a column at the end of all rows."""
 
+        for row in range(0, self.rows):
+            self.cell_matrix[row].append(Cell(self.columns, row, def_value))
         self.columns += 1
 
+    def remove_row(self, row_index: int=-1):
+        """Removes a row at a given index."""
+
+        self.cell_matrix.pop(row_index)
+        self.rows -= 1
+
+    def remove_column(self, column_index: int=-1):
+        """Removes a column from all rows at a given index"""
+
         for row in range(0, self.rows):
-            self.cell_matrix[row].append(Cell(self.columns-1, row, def_value))
+            self.cell_matrix[row].pop(column_index)
+        self.columns -= 1
 
     def __len__(self):
         return self.rows * self.columns
@@ -55,15 +67,3 @@ class Table:
             self.column += 1
 
         return self.cell_matrix[y][x]
-
-
-if __name__ == '__main__':
-    table = Table(2,3, "hello")
-    for cell in table:
-        print(cell)
-
-    table.add_column("World")
-
-    print("\n")
-    for cell in table:
-        print(cell)
