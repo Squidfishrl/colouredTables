@@ -14,7 +14,12 @@ class Cell:
         }
 
     def __str__(self):
-        return f"{self.value}"
+
+        return (
+            f'{self.border["top_left"]}{self.border["top"]}{self.border["top_right"]}\n'
+            f'{self.border["left"]} {self.value} {self.border["right"]}\n'
+            f'{self.border["bottom_left"]}{self.border["bottom"]}{self.border["bottom_right"]}\n'
+        )
 
 
 class Table:
@@ -28,35 +33,13 @@ class Table:
             for row in range(0, rows)
         ]
 
-        self.generate_borders()
-
     def generate_borders(self):
-        """
-        For each cell
-            if cell_above
-                cell.border.top_left = &cell_above.border.bottom_left
-                cell.border.top = &cell_above.border.bottom
-                cell.border.top_right = &cell_above.border.bottom_right
-            else
-                cell.generate_horizontal_border(style) // generates edges as well
-            end
-
-            if cell_left
-                cell.border.left = &cell_left.border.right
-            else
-                cell.generate_vertical_border(style)
-            end
-
-            cell.border.bottom = cell.generate_horizontal_border(style)
-            cell.border.right = cell.generate_bertical_border(style)
-        end
-        """
 
         for cell in self:
 
             # top
             if cell.cords["y"] == 0:
-                cell.border["top"] = "═"
+                cell.border["top"] = "═══"
 
                 cell.border["top_left"] = "╤"
                 cell.border["top_right"] = "╤"
@@ -67,9 +50,9 @@ class Table:
                 if cell.cords["x"] == self.columns-1:  # if and not elif incase of a single column table
                     cell.border["top_right"] = '╗'
             else:
-                cell.border["top"] = self.above(cell)["bottom"]
-                cell.border["top_left"] = self.above(cell)["bottom_left"]
-                cell.border["top_right"] = self.above(cell)["bottom_right"]
+                cell.border["top"] = self.above(cell).border["bottom"]
+                cell.border["top_left"] = self.above(cell).border["bottom_left"]
+                cell.border["top_right"] = self.above(cell).border["bottom_right"]
 
             # left
             if cell.cords["x"] == 0:
@@ -82,13 +65,13 @@ class Table:
                 if cell.cords["y"] != self.rows-1:
                     cell.border["bottom_left"] = '╟'
             else:
-                cell.border["top_left"] = self.left(cell)["top_right"]
-                cell.border["left"] = self.left(cell)["right"]
-                cell.border["bottom_left"] = self.left(cell)["bottom_right"]
+                cell.border["top_left"] = self.left(cell).border["top_right"]
+                cell.border["left"] = self.left(cell).border["right"]
+                cell.border["bottom_left"] = self.left(cell).border["bottom_right"]
 
             # bottom
             if cell.cords["y"] == self.rows-1:
-                cell.border["bottom"] = "═"
+                cell.border["bottom"] = "═══"
 
                 cell.border["bottom_left"] = "╧"
                 cell.border["bottom_right"] = "╧"
@@ -99,7 +82,7 @@ class Table:
                 if cell.cords["x"] == self.columns-1:  # if and not elif incase of a single column table
                     cell.border["bottom_right"] = '╝'
             else:
-                cell.border["bottom"] = "─"
+                cell.border["bottom"] = "───"
                 cell.border["bottom_right"] = '┼'
 
             # right
@@ -118,13 +101,13 @@ class Table:
         if cell.cords["y"] == 0:
             raise ValueError
 
-        return self.cell_matrix[cell.cords["x"], cell.cords["y"]-1]
+        return self.cell_matrix[cell.cords["y"]-1][cell.cords["x"]]
 
     def left(self, cell):
         if cell.cords["x"] == 0:
             raise ValueError
 
-        return self.cell_matrix[cell.cords["x"]-1, cell.cords["y"]]
+        return self.cell_matrix[cell.cords["y"]][cell.cords["x"]-1]
 
     def add_row(self, def_value=" "):
         """Adds a row at the end of the table."""
@@ -180,3 +163,6 @@ class Table:
 
 if __name__ == '__main__':
     table = Table(4,5, 'a')
+    table.generate_borders()
+    for cell in table:
+        print(cell)
