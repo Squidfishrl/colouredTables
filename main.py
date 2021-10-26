@@ -97,19 +97,24 @@ class Table:
                 cell.border["right"] = "│"
 
 
-    def above(self, cell):
+    def above(self, cell: Cell) -> Cell:
+        """Returns the cell above the passed one."""
+
+
         if cell.cords["y"] == 0:
             raise ValueError
 
         return self.cell_matrix[cell.cords["y"]-1][cell.cords["x"]]
 
-    def left(self, cell):
+    def left(self, cell: Cell) -> Cell:
+        """Returns the cell left of the passed one."""
+
         if cell.cords["x"] == 0:
             raise ValueError
 
         return self.cell_matrix[cell.cords["y"]][cell.cords["x"]-1]
 
-    def add_row(self, def_value=" "):
+    def add_row(self, def_value=" ") -> None:
         """Adds a row at the end of the table."""
 
         self.cell_matrix.append(
@@ -117,20 +122,20 @@ class Table:
         )
         self.rows += 1
 
-    def add_column(self, def_value=" "):
+    def add_column(self, def_value=" ") -> None:
         """Adds a column at the end of all rows."""
 
         for row in range(0, self.rows):
             self.cell_matrix[row].append(Cell(self.columns, row, def_value))
         self.columns += 1
 
-    def remove_row(self, row_index: int = -1):
+    def remove_row(self, row_index: int = -1) -> None:
         """Removes a row at a given index."""
 
         self.cell_matrix.pop(row_index)
         self.rows -= 1
 
-    def remove_column(self, column_index: int = -1):
+    def remove_column(self, column_index: int = -1) -> None:
         """Removes a column from all rows at a given index"""
 
         for row in range(0, self.rows):
@@ -161,8 +166,37 @@ class Table:
 
         return self.cell_matrix[y][x]
 
+    def __str__(self) -> str:
+        table = ""
+
+        for row in self.cell_matrix:
+
+            for line in range(0, 3):
+
+                for cell in row:
+                    if line == 0:
+                        if cell.cords["y"] == 0 and cell.cords["x"] == 0:
+                            table += f'{cell.border["top_left"]}{cell.border["top"]}{cell.border["top_right"]}'
+                        elif cell.cords["y"] == 0:
+                            table += f'{cell.border["top"]}{cell.border["top_right"]}'
+                    elif line == 1:
+                        if cell.cords["x"] == 0:
+                            table += f'{cell.border["left"]}'
+                        table += f' {cell.value} {cell.border["right"]}'
+                    elif line == 2:
+                        if cell.cords["x"] == 0:
+                            table += f'{cell.border["bottom_left"]}{cell.border["bottom"]}{cell.border["bottom_right"]}'
+                        else:
+                            table += f'{cell.border["bottom"]}{cell.border["bottom_right"]}'
+                if cell.cords["y"] == 0 or line != 0:
+                    table += "\n"
+
+        return table
+
+
 if __name__ == '__main__':
     table = Table(4,5, 'a')
     table.generate_borders()
-    for cell in table:
-        print(cell)
+    # for cell in table:
+    #     print(cell)
+    print(table)
