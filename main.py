@@ -1,16 +1,29 @@
+class Line:
+    """
+    Class with a single attribute.
+    Its purpose is to preserve references between the cell borders.
+    """
+
+    def __init__(self, line: str):
+        self.line = line
+
+    def __str__(self):
+        return self.line
+
+
 class Cell:
     def __init__(self, column: int, row: int, value=" "):
         self.value = value
         self.cords = {"x": column, "y": row}
         self.border = {
-            "top_left":'',
-            "top":"",
-            "top_right":'',
-            "left":"",
-            "right":"",
-            "bottom_left":'',
-            "bottom":"",
-            "bottom_right":''
+            "top_left": "",
+            "top": "",
+            "top_right": "",
+            "left": "",
+            "right": "",
+            "bottom_left": "",
+            "bottom": "",
+            "bottom_right": "",
         }
 
     def __str__(self):
@@ -39,16 +52,17 @@ class Table:
 
             # top
             if cell.cords["y"] == 0:
-                cell.border["top"] = "═══"
+                cell.border["top"] = Line("═══")
 
-                cell.border["top_left"] = "╤"
-                cell.border["top_right"] = "╤"
+                cell.border["top_left"] = Line("╤")
+                cell.border["top_right"] = Line("╤")
 
                 # edge cell cases
+                # use ifs and not elif incase of a single column table
                 if cell.cords["x"] == 0:
-                    cell.border["top_left"] = '╔'
-                if cell.cords["x"] == self.columns-1:  # if and not elif incase of a single column table
-                    cell.border["top_right"] = '╗'
+                    cell.border["top_left"] = Line("╔")
+                if cell.cords["x"] == self.columns - 1:
+                    cell.border["top_right"] = Line("╗")
             else:
                 cell.border["top"] = self.above(cell).border["bottom"]
                 cell.border["top_left"] = self.above(cell).border["bottom_left"]
@@ -57,54 +71,53 @@ class Table:
             # left
             if cell.cords["x"] == 0:
 
-                cell.border["left"] = '║'
+                cell.border["left"] = Line("║")
 
                 # edge cell cases
                 if cell.cords["y"] != 0:
-                    cell.border["top_left"] = '╟'
-                if cell.cords["y"] != self.rows-1:
-                    cell.border["bottom_left"] = '╟'
+                    cell.border["top_left"] = Line("╟")
+                if cell.cords["y"] != self.rows - 1:
+                    cell.border["bottom_left"] = Line("╟")
             else:
                 cell.border["top_left"] = self.left(cell).border["top_right"]
                 cell.border["left"] = self.left(cell).border["right"]
                 cell.border["bottom_left"] = self.left(cell).border["bottom_right"]
 
             # bottom
-            if cell.cords["y"] == self.rows-1:
-                cell.border["bottom"] = "═══"
+            if cell.cords["y"] == self.rows - 1:
+                cell.border["bottom"] = Line("═══")
 
-                cell.border["bottom_left"] = "╧"
-                cell.border["bottom_right"] = "╧"
+                cell.border["bottom_left"] = Line("╧")
+                cell.border["bottom_right"] = Line("╧")
 
                 # edge cases
+                # use ifs and not elif incase of a single row table
                 if cell.cords["x"] == 0:
-                    cell.border["bottom_left"] = '╚'
-                if cell.cords["x"] == self.columns-1:  # if and not elif incase of a single column table
-                    cell.border["bottom_right"] = '╝'
+                    cell.border["bottom_left"] = Line("╚")
+                if cell.cords["x"] == self.columns - 1:
+                    cell.border["bottom_right"] = Line("╝")
             else:
-                cell.border["bottom"] = "───"
-                cell.border["bottom_right"] = '┼'
+                cell.border["bottom"] = Line("───")
+                cell.border["bottom_right"] = Line("┼")
 
             # right
-            if cell.cords["x"] == self.columns-1:
+            if cell.cords["x"] == self.columns - 1:
 
-                cell.border["right"] = "║"
+                cell.border["right"] = Line("║")
                 if cell.cords["y"] != 0:
-                    cell.border["top_right"] = "╢"
-                if cell.cords["y"] != self.rows-1:
-                    cell.border["bottom_right"] = "╢"
+                    cell.border["top_right"] = Line("╢")
+                if cell.cords["y"] != self.rows - 1:
+                    cell.border["bottom_right"] = Line("╢")
             else:
-                cell.border["right"] = "│"
-
+                cell.border["right"] = Line("│")
 
     def above(self, cell: Cell) -> Cell:
         """Returns the cell above the passed one."""
 
-
         if cell.cords["y"] == 0:
             raise ValueError
 
-        return self.cell_matrix[cell.cords["y"]-1][cell.cords["x"]]
+        return self.cell_matrix[cell.cords["y"] - 1][cell.cords["x"]]
 
     def left(self, cell: Cell) -> Cell:
         """Returns the cell left of the passed one."""
@@ -112,7 +125,7 @@ class Table:
         if cell.cords["x"] == 0:
             raise ValueError
 
-        return self.cell_matrix[cell.cords["y"]][cell.cords["x"]-1]
+        return self.cell_matrix[cell.cords["y"]][cell.cords["x"] - 1]
 
     def add_row(self, def_value=" ") -> None:
         """Adds a row at the end of the table."""
@@ -187,16 +200,10 @@ class Table:
                         if cell.cords["x"] == 0:
                             table += f'{cell.border["bottom_left"]}{cell.border["bottom"]}{cell.border["bottom_right"]}'
                         else:
-                            table += f'{cell.border["bottom"]}{cell.border["bottom_right"]}'
+                            table += (
+                                f'{cell.border["bottom"]}{cell.border["bottom_right"]}'
+                            )
                 if cell.cords["y"] == 0 or line != 0:
                     table += "\n"
 
         return table
-
-
-if __name__ == '__main__':
-    table = Table(4,5, 'a')
-    table.generate_borders()
-    # for cell in table:
-    #     print(cell)
-    print(table)
